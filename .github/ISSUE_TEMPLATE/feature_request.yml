@@ -1,0 +1,173 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for foundry-test-utils
+title: "[Feature] "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - rayners
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide details about what you'd like to see added to the testing utilities.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component would this feature enhance?
+      options:
+        - Foundry Mocks
+        - Test Helpers
+        - TypeScript Definitions
+        - Package Structure
+        - ApplicationV2 Mocking
+        - DOM Testing Utilities
+        - Event Mocking
+        - New Component
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Feature Type
+      description: What type of feature is this?
+      options:
+        - New Mock Object
+        - Enhanced Mock Functionality
+        - New Test Utility
+        - TypeScript Definition Improvement
+        - Testing Pattern/Helper
+        - Documentation Enhancement
+        - Performance Improvement
+        - Developer Experience Enhancement
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: foundry-version
+    attributes:
+      label: Target Foundry Version
+      description: Which Foundry VTT version is this feature for?
+      options:
+        - v13 (Latest)
+        - v12 
+        - v11
+        - All versions
+        - Future versions
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A brief summary of the feature you'd like to see added.
+      placeholder: One-line description of the testing feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Testing Motivation
+      description: What testing scenario does this feature enable? What testing problem does it solve?
+      placeholder: Explain the testing problem this feature would solve...
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Detailed Description
+      description: Provide a detailed description of the proposed testing feature.
+      placeholder: Describe the feature in detail...
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Usage Examples
+      description: Show how this feature would be used in tests.
+      placeholder: |
+        ```typescript
+        // Example test usage
+        import { newFeature } from '@rayners/foundry-test-utils';
+        
+        test('example test', () => {
+          const mock = newFeature();
+          // test code
+        });
+        ```
+      render: typescript
+
+  - type: textarea
+    id: current-workaround
+    attributes:
+      label: Current Workaround
+      description: How are you currently testing this scenario? What workarounds are you using?
+      placeholder: Describe your current testing approach...
+
+  - type: textarea
+    id: foundry-api
+    attributes:
+      label: Related Foundry API
+      description: Which Foundry VTT APIs or objects would this feature help test?
+      placeholder: |
+        - Scene API
+        - Actor API 
+        - Application framework
+        - Canvas layers
+        - etc.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this testing feature to you?
+      options:
+        - Low - Nice to have for testing
+        - Medium - Would improve test coverage
+        - High - Needed for comprehensive testing
+        - Critical - Blocking effective testing
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple - Small mock enhancement
+        - Medium - New utility with existing patterns
+        - Complex - Major new mocking functionality
+        - Unknown - Not sure
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be interested in contributing to this feature?
+      options:
+        - label: I would be willing to help implement this feature
+        - label: I would be willing to test this feature
+        - label: I would be willing to write tests for this feature
+        - label: I would be willing to write documentation for this feature
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to ensure this feature hasn't been requested before
+          required: true
+        - label: This feature would benefit the broader foundry testing community
+          required: true
+        - label: I have provided clear testing examples and use cases
+          required: true

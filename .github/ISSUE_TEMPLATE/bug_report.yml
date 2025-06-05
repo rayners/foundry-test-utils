@@ -1,0 +1,142 @@
+name: Bug Report
+description: Report a bug or issue with foundry-test-utils
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+assignees:
+  - rayners
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible.
+
+  - type: input
+    id: version
+    attributes:
+      label: Package Version
+      description: What version of @rayners/foundry-test-utils are you using?
+      placeholder: "e.g., 1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is experiencing the issue?
+      options:
+        - Foundry Mocks
+        - Test Helpers
+        - TypeScript Definitions
+        - Package Structure
+        - ApplicationV2 Mocking
+        - DOM Testing Utilities
+        - Event Mocking
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: foundry-version
+    attributes:
+      label: Foundry VTT Version
+      description: Which version of Foundry VTT are you testing against?
+      options:
+        - v13 (Latest)
+        - v12
+        - v11
+        - Multiple versions
+        - Not applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe what happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Provide step-by-step instructions to reproduce the issue.
+      placeholder: |
+        1. Import test utils with...
+        2. Set up mock with...
+        3. Run test...
+        4. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen in your test?
+      placeholder: Describe the expected test behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened in your test?
+      placeholder: Describe what actually happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Information about your testing environment
+      value: |
+        - Node.js version: 
+        - npm version: 
+        - Test framework: (Vitest/Jest/other)
+        - Operating System: 
+        - Foundry module being tested: 
+    validations:
+      required: true
+
+  - type: textarea
+    id: test-code
+    attributes:
+      label: Test Code
+      description: If applicable, provide the test code that is failing
+      render: typescript
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: If applicable, add any error logs or test output
+      render: shell
+
+  - type: textarea
+    id: mock-config
+    attributes:
+      label: Mock Configuration
+      description: How are you configuring the mocks? What setup are you using?
+      render: typescript
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to ensure this bug hasn't been reported before
+          required: true
+        - label: I have provided all the requested information above
+          required: true
+        - label: I am using a supported Node.js version (18.x, 20.x, or 22.x)
+          required: true
+        - label: I am using a supported test framework (Vitest recommended)
+          required: true
