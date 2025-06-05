@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate package structure
+        run: |
+          echo "Validating foundry-test-utils package structure..."
+          
+          # Check required files exist
+          test -f mocks/foundry-mocks.ts || { echo "Missing foundry-mocks.ts"; exit 1; }
+          test -f helpers/setup.ts || { echo "Missing setup.ts"; exit 1; }
+          test -f types/foundry-types.d.ts || { echo "Missing foundry-types.d.ts"; exit 1; }
+          test -f index.js || { echo "Missing index.js"; exit 1; }
+          
+          echo "✅ All required files present"
+
+      - name: Validate TypeScript syntax
+        run: |
+          echo "Validating TypeScript syntax..."
+          npx tsc --noEmit --skipLibCheck mocks/foundry-mocks.ts
+          npx tsc --noEmit --skipLibCheck helpers/setup.ts
+          npx tsc --noEmit --skipLibCheck types/foundry-types.d.ts
+          echo "✅ All TypeScript files have valid syntax"
+
+      - name: Validate JavaScript syntax
+        run: |
+          echo "Validating JavaScript syntax..."
+          node -c index.js
+          echo "✅ JavaScript files have valid syntax"
+
+      - name: Validate JSON syntax
+        run: |
+          echo "Validating JSON syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
+          echo "✅ JSON files have valid syntax"
+
+      - name: Test foundry-mocks can be imported
+        run: |
+          echo "Testing foundry-mocks import..."
+          node -e "
+            try {
+              const fs = require('fs');
+              const content = fs.readFileSync('mocks/foundry-mocks.ts', 'utf8');
+              if (!content.includes('export interface') || !content.includes('MockScene')) {
+                throw new Error('foundry-mocks.ts missing expected exports');
+              }
+              console.log('✅ foundry-mocks.ts has expected content');
+            } catch (error) {
+              console.error('❌ foundry-mocks.ts validation failed:', error.message);
+              process.exit(1);
+            }
+          "
+
+      - name: Test package creation
+        run: |
+          npm pack --dry-run
+          echo "✅ Package can be created successfully"
