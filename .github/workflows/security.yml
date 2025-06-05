@@ -165,11 +165,8 @@ jobs:
             'MockScene',
             'MockActor', 
             'MockItem',
-            'MockToken',
             'MockUser',
-            'MockApplication',
-            'HandlebarsApplicationMixin',
-            'DocumentSheetV2'
+            'MockApplication'
           ];
           
           let missing = [];
