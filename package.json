@@ -1,0 +1,41 @@
+{
+  "name": "@rayners/foundry-test-utils",
+  "version": "1.0.0",
+  "description": "Shared testing utilities and mocks for FoundryVTT modules",
+  "main": "index.js",
+  "type": "module",
+  "files": [
+    "mocks/",
+    "types/",
+    "helpers/",
+    "index.js"
+  ],
+  "scripts": {
+    "test": "echo \"No tests yet\"",
+    "prepublishOnly": "echo \"Building test utilities...\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rayners/foundry-test-utils.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "keywords": [
+    "foundryvtt",
+    "foundry",
+    "testing",
+    "mocks",
+    "vitest",
+    "test-utils"
+  ],
+  "author": "David Raynes <rayners@gmail.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "vitest": "^3.1.0",
+    "jsdom": "^26.1.0"
+  },
+  "dependencies": {
+    "@types/jquery": "^3.5.32"
+  }
+}
