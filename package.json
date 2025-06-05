@@ -37,5 +37,8 @@
   },
   "dependencies": {
     "@types/jquery": "^3.5.32"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
   }
 }
