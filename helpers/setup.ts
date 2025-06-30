@@ -5,6 +5,8 @@
  * Import this in your vitest.config.js setupFiles array.
  */
 
+/// <reference types="@rayners/foundry-dev-tools/types" />
+
 import { vi, beforeEach } from 'vitest';
 import '../mocks/foundry-mocks.js';
 

@@ -12,6 +12,8 @@
  * ```
  */
 
+/// <reference types="@rayners/foundry-dev-tools/types" />
+
 import { vi } from 'vitest';
 
 // ============================================================================
@@ -269,7 +271,7 @@ export class MockDialogClass {
 
 export function setupFoundryGlobals() {
   // Foundry utility functions
-  globalThis.foundry = {
+  (globalThis as any).foundry = {
     abstract: {
       TypeDataModel: class MockTypeDataModel {
         constructor(data = {}) {
@@ -510,6 +512,7 @@ export function setupFoundryGame(options: {
       title: 'Test System',
       data: {}
     },
+    version: '13.331',
     documentTypes: {
       Actor: ['character', 'npc'],
       Item: ['weapon', 'armor'],

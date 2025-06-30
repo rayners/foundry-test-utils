@@ -5,13 +5,13 @@
  */
 
 // Import mocks to ensure they're available
-import './mocks/foundry-mocks.ts';
+import './mocks/foundry-mocks';
 
 // Export mock utilities
-export * from './mocks/foundry-mocks.ts';
+export * from './mocks/foundry-mocks';
 
 // Export helper functions
-export * from './helpers/setup.ts';
+export * from './helpers/setup';
 
-// Export type definitions
-export * from './types/foundry-types.ts';
+// Export system-specific test utilities
+export * from './systems/pf2e/setup';

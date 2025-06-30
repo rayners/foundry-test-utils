@@ -9,6 +9,7 @@
     "allowJs": true,
     "strict": false,
     "skipLibCheck": true,
+    "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "declarationMap": false,
@@ -17,8 +18,10 @@
     "resolveJsonModule": true
   },
   "include": [
+    "index.ts",
     "mocks/**/*.ts",
-    "helpers/**/*.ts", 
+    "helpers/**/*.ts",
+    "systems/**/*.ts",
     "types/**/*.d.ts"
   ],
   "exclude": [
