@@ -283,17 +283,21 @@ export function setupFoundryGlobals() {
     data: {
       fields: {
         HTMLField: class {
-          constructor(options = {}) {
+          options: any;
+          constructor(options: any = {}) {
             this.options = options;
           }
         },
         StringField: class {
-          constructor(options = {}) {
+          options: any;
+          constructor(options: any = {}) {
             this.options = options;
           }
         },
         NumberField: class {
-          constructor(options = {}) {
+          options: any;
+          initial: any;
+          constructor(options: any = {}) {
             this.options = options;
             if (typeof options.initial === 'function') {
               this.initial = options.initial();
@@ -303,33 +307,40 @@ export function setupFoundryGlobals() {
           }
         },
         BooleanField: class {
-          constructor(options = {}) {
+          options: any;
+          initial: boolean;
+          constructor(options: any = {}) {
             this.options = options;
             this.initial = options.initial || false;
           }
         },
         ObjectField: class {
-          constructor(options = {}) {
+          options: any;
+          constructor(options: any = {}) {
             this.options = options;
           }
         },
         SchemaField: class {
-          constructor(schema = {}) {
+          schema: any;
+          constructor(schema: any = {}) {
             this.schema = schema;
           }
         },
         ArrayField: class {
-          constructor(element) {
+          element: any;
+          constructor(element: any) {
             this.element = element;
           }
         },
         DocumentIdField: class {
-          constructor(options = {}) {
+          options: any;
+          constructor(options: any = {}) {
             this.options = options;
           }
         },
         FilePathField: class {
-          constructor(options = {}) {
+          options: any;
+          constructor(options: any = {}) {
             this.options = options;
           }
         }
@@ -359,7 +370,8 @@ export function setupFoundryGlobals() {
     canvas: {
       layers: {
         RegionLayer: class MockRegionLayer {
-          constructor(options = {}) {
+          options: any;
+          constructor(options: any = {}) {
             this.options = options;
           }
           activate() {}
@@ -371,38 +383,30 @@ export function setupFoundryGlobals() {
     }
   };
 
-  // Template functions
-  globalThis.loadTemplates = vi.fn().mockResolvedValue({});
-  globalThis.renderTemplate = vi.fn().mockResolvedValue('<div>Mock Template</div>');
-  globalThis.getTemplate = vi.fn().mockResolvedValue(() => '<div>Mock Template</div>');
+  const g = globalThis as any;
 
-  // Utility functions (map to foundry.utils)
-  globalThis.mergeObject = globalThis.foundry.utils.mergeObject;
-  globalThis.duplicate = globalThis.foundry.utils.duplicate;
-  globalThis.setProperty = globalThis.foundry.utils.setProperty;
-  globalThis.getProperty = globalThis.foundry.utils.getProperty;
-  globalThis.hasProperty = globalThis.foundry.utils.hasProperty;
-  globalThis.expandObject = globalThis.foundry.utils.expandObject;
-  globalThis.flattenObject = globalThis.foundry.utils.flattenObject;
-  globalThis.isNewerVersion = globalThis.foundry.utils.isNewerVersion;
+  // Template functions
+  g.loadTemplates = vi.fn().mockResolvedValue({});
+  g.renderTemplate = vi.fn().mockResolvedValue('<div>Mock Template</div>');
+  g.getTemplate = vi.fn().mockResolvedValue(() => '<div>Mock Template</div>');
 
   // Document lookup functions
-  globalThis.fromUuid = vi.fn();
-  globalThis.fromUuidSync = vi.fn();
+  g.fromUuid = vi.fn();
+  g.fromUuidSync = vi.fn();
 
   // Text editor
-  globalThis.TextEditor = {
+  g.TextEditor = {
     enrichHTML: vi.fn(content => content)
   };
 
   // Handlebars
-  globalThis.Handlebars = {
+  g.Handlebars = {
     registerHelper: vi.fn(),
     registerPartial: vi.fn()
   };
 
   // Hooks system
-  globalThis.Hooks = {
+  g.Hooks = {
     on: vi.fn(),
     once: vi.fn(),
     off: vi.fn(),
@@ -411,7 +415,7 @@ export function setupFoundryGlobals() {
   };
 
   // PIXI Graphics (for canvas-based tests)
-  globalThis.PIXI = {
+  g.PIXI = {
     Graphics: vi.fn(() => ({
       beginFill: vi.fn(),
       drawPolygon: vi.fn(),
@@ -423,8 +427,10 @@ export function setupFoundryGlobals() {
   };
 
   // Canvas Layer base class
-  globalThis.CanvasLayer = class MockCanvasLayer {
-    constructor(options = {}) {
+  g.CanvasLayer = class MockCanvasLayer {
+    options: any;
+    name: string;
+    constructor(options: any = {}) {
       this.options = options;
       this.name = options.name || 'mock';
     }
@@ -440,7 +446,7 @@ export function setupFoundryGlobals() {
   };
 
   // CONST object
-  globalThis.CONST = {
+  g.CONST = {
     KEYBINDING_SCOPES: {
       GLOBAL: 'global',
       CLIENT: 'client'
@@ -449,32 +455,34 @@ export function setupFoundryGlobals() {
 }
 
 export function setupFoundryDocuments() {
+  const g = globalThis as any;
+
   // Document classes
-  globalThis.Actor = MockActorClass;
-  globalThis.RollTable = MockRollTableClass;
-  globalThis.Folder = MockFolderClass;
-  globalThis.Dialog = MockDialogClass;
+  g.Actor = MockActorClass;
+  g.RollTable = MockRollTableClass;
+  g.Folder = MockFolderClass;
+  g.Dialog = MockDialogClass;
 
   // Sheet classes
-  globalThis.ActorSheet = class MockActorSheet {};
-  globalThis.Application = class MockApplication {};
-  globalThis.FormApplication = class MockFormApplication {};
+  g.ActorSheet = class MockActorSheet {};
+  g.Application = class MockApplication {};
+  g.FormApplication = class MockFormApplication {};
 
   // Other document classes
-  globalThis.ChatMessage = class MockChatMessage {
+  g.ChatMessage = class MockChatMessage {
     static async create() {}
   };
 
   // Roll class
-  globalThis.Roll = class MockRoll {
+  g.Roll = class MockRoll {
+    formula: string;
+    total: number;
+
     constructor(formula: string) {
       this.formula = formula;
       this.total = 10; // Default total
     }
-    
-    formula: string;
-    total: number;
-    
+
     async evaluate() {
       return this;
     }
@@ -488,8 +496,8 @@ export function setupFoundryGame(options: {
 } = {}) {
   const mockUser = createMockUser(options.user);
   const mockScenes = options.scenes || [createMockScene()];
-  
-  globalThis.game = {
+
+  (globalThis as any).game = {
     user: mockUser,
     userId: mockUser.id,
     users: new Map([[mockUser.id, mockUser]]),
@@ -522,7 +530,7 @@ export function setupFoundryGame(options: {
 }
 
 export function setupFoundryUI() {
-  globalThis.ui = {
+  (globalThis as any).ui = {
     notifications: {
       info: vi.fn(),
       warn: vi.fn(),
@@ -533,8 +541,8 @@ export function setupFoundryUI() {
 
 export function setupFoundryCanvas(scene?: MockScene) {
   const mockScene = scene || createMockScene();
-  
-  globalThis.canvas = {
+
+  (globalThis as any).canvas = {
     scene: mockScene,
     regions: {
       activate: vi.fn(),
@@ -545,7 +553,7 @@ export function setupFoundryCanvas(scene?: MockScene) {
 }
 
 export function setupFoundryConfig() {
-  globalThis.CONFIG = {
+  (globalThis as any).CONFIG = {
     Actor: {
       documentClass: MockActorClass,
       typeLabels: {}

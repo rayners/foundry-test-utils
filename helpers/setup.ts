@@ -11,8 +11,9 @@ import { vi, beforeEach } from 'vitest';
 import '../mocks/foundry-mocks.js';
 
 // Mock jQuery if not already available
-if (typeof global.$ === 'undefined') {
-  global.$ = vi.fn(() => ({
+const g = globalThis as any;
+if (typeof g.$ === 'undefined') {
+  g.$ = vi.fn(() => ({
     ready: vi.fn(),
     on: vi.fn(),
     off: vi.fn(),
@@ -34,23 +35,23 @@ if (typeof global.$ === 'undefined') {
     click: vi.fn(),
     submit: vi.fn()
   }));
-  global.jQuery = global.$;
+  g.jQuery = g.$;
 }
 
 // Setup DOM environment
 beforeEach(() => {
   // Clear any existing DOM
   document.body.innerHTML = '';
-  
+
   // Reset all mocks
   vi.clearAllMocks();
-  
+
   // Ensure game object is properly reset
-  if (global.game) {
+  if (g.game) {
     // Reset collections
-    Object.keys(global.game).forEach(key => {
-      if (global.game[key] && typeof global.game[key] === 'object' && global.game[key].clear) {
-        global.game[key].clear();
+    Object.keys(g.game).forEach((key: string) => {
+      if (g.game[key] && typeof g.game[key] === 'object' && g.game[key].clear) {
+        g.game[key].clear();
       }
     });
   }
