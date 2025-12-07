@@ -591,6 +591,8 @@ export function setupFoundryGlobals(options: { functionalHooks?: boolean } = {})
 
   // Hooks system - use functional hooks by default for proper callback execution
   if (options.functionalHooks !== false) {
+    // Clear any existing hooks from previous setup runs to prevent cross-test leakage
+    MockHooks.clear();
     g.Hooks = MockHooks;
   } else {
     g.Hooks = {
