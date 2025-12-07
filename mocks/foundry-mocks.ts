@@ -266,10 +266,183 @@ export class MockDialogClass {
 }
 
 // ============================================================================
+// FUNCTIONAL HOOKS SYSTEM
+// ============================================================================
+
+/**
+ * Enhanced Hook system mock that actually registers and executes callbacks.
+ * This allows tests to verify that hooks are called with correct arguments
+ * and that hook callbacks are properly executed.
+ */
+export class MockHooks {
+  private static hooks: Map<string, Function[]> = new Map();
+
+  static once(event: string, callback: Function): number {
+    const callbacks = this.hooks.get(event) || [];
+    const wrappedCallback = (...args: any[]) => {
+      const result = callback(...args);
+      this.off(event, wrappedCallback);
+      return result;
+    };
+    callbacks.push(wrappedCallback);
+    this.hooks.set(event, callbacks);
+    return callbacks.length;
+  }
+
+  static on(event: string, callback: Function): number {
+    const callbacks = this.hooks.get(event) || [];
+    callbacks.push(callback);
+    this.hooks.set(event, callbacks);
+    return callbacks.length;
+  }
+
+  static off(event: string, callback?: Function): void {
+    if (!callback) {
+      this.hooks.delete(event);
+      return;
+    }
+    const callbacks = this.hooks.get(event) || [];
+    const index = callbacks.indexOf(callback);
+    if (index !== -1) {
+      callbacks.splice(index, 1);
+    }
+  }
+
+  static call(event: string, ...args: any[]): boolean {
+    const callbacks = this.hooks.get(event) || [];
+    for (const callback of callbacks) {
+      try {
+        const result = callback(...args);
+        if (result === false) {
+          return false;
+        }
+      } catch {
+        // Ignore hook callback errors in tests
+      }
+    }
+    return true;
+  }
+
+  static callAll(event: string, ...args: any[]): boolean {
+    const callbacks = this.hooks.get(event) || [];
+    let result = true;
+    for (const callback of callbacks) {
+      try {
+        const callbackResult = callback(...args);
+        if (callbackResult === false) {
+          result = false;
+        }
+      } catch {
+        // Ignore hook callback errors to keep test output clean
+      }
+    }
+    return result;
+  }
+
+  static clear(): void {
+    this.hooks.clear();
+  }
+
+  /**
+   * Get registered callbacks for a hook (useful for testing)
+   */
+  static getCallbacks(event: string): Function[] {
+    return this.hooks.get(event) || [];
+  }
+}
+
+// ============================================================================
+// FOUNDRY V13 APPLICATION FRAMEWORK
+// ============================================================================
+
+/**
+ * Mock ApplicationV2 class for Foundry v13+
+ */
+export class MockApplicationV2 {
+  static DEFAULT_OPTIONS = {};
+  static PARTS: Record<string, any> = {};
+
+  options: any;
+  element: HTMLElement | null = null;
+
+  constructor(options: any = {}) {
+    this.options = options;
+  }
+
+  render(_force?: boolean): Promise<this> {
+    return Promise.resolve(this);
+  }
+
+  close(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  setPosition(_position?: any): void {}
+}
+
+/**
+ * Mock HandlebarsApplicationMixin for Foundry v13+
+ */
+export function MockHandlebarsApplicationMixin<T extends new (...args: any[]) => any>(Base: T) {
+  return class extends Base {
+    _prepareContext(): Record<string, any> {
+      return {};
+    }
+
+    _onRender(): Promise<void> {
+      return Promise.resolve();
+    }
+
+    _replaceHTML(_result: any, _content: HTMLElement, _options: any): void {}
+  };
+}
+
+/**
+ * Mock CalendarData for Foundry v13 calendar integration
+ */
+export class MockCalendarData {
+  constructor(_data?: object, _options?: any) {
+    // Mock constructor
+  }
+
+  timeToComponents(_time?: number): any {
+    return { year: 0, month: 1, day: 1, hour: 0, minute: 0, second: 0 };
+  }
+
+  componentsToTime(_components: any): number {
+    return 0;
+  }
+
+  add(_startTime: any, _deltaTime: any): any {
+    return { year: 0, month: 1, day: 1, hour: 0, minute: 0, second: 0 };
+  }
+
+  difference(_endTime: any, _startTime?: any): any {
+    return { year: 0, month: 1, day: 1, hour: 0, minute: 0, second: 0 };
+  }
+
+  format(_time?: any, _formatter?: string, _options?: any): string {
+    return 'Mock date';
+  }
+
+  isLeapYear(_year: number): boolean {
+    return false;
+  }
+
+  countLeapYears(_year: number): number {
+    return 0;
+  }
+
+  static defineSchema(): any {
+    return {};
+  }
+}
+
+// ============================================================================
 // FOUNDRY GLOBALS SETUP
 // ============================================================================
 
-export function setupFoundryGlobals() {
+export function setupFoundryGlobals(options: { functionalHooks?: boolean } = {}) {
   // Foundry utility functions
   (globalThis as any).foundry = {
     abstract: {
@@ -346,8 +519,14 @@ export function setupFoundryGlobals() {
         }
       }
     },
+    applications: {
+      api: {
+        ApplicationV2: MockApplicationV2,
+        HandlebarsApplicationMixin: MockHandlebarsApplicationMixin,
+      },
+    },
     utils: {
-      mergeObject: vi.fn((original, other, options = {}) => ({ ...original, ...other })),
+      mergeObject: vi.fn((original, other, _options = {}) => ({ ...original, ...other })),
       duplicate: vi.fn(obj => JSON.parse(JSON.stringify(obj))),
       setProperty: vi.fn(),
       getProperty: vi.fn(),
@@ -355,7 +534,8 @@ export function setupFoundryGlobals() {
       expandObject: vi.fn(),
       flattenObject: vi.fn(),
       isNewerVersion: vi.fn(),
-      randomID: vi.fn(() => Math.random().toString(36).substr(2, 9))
+      randomID: vi.fn(() => Math.random().toString(36).substr(2, 9)),
+      debounce: vi.fn((callback: Function, _delay: number) => callback),
     },
     documents: {
       BaseRegion: class MockBaseRegion {
@@ -383,6 +563,9 @@ export function setupFoundryGlobals() {
     }
   };
 
+  // Also expose CalendarData for Foundry v13+
+  (globalThis as any).foundry.data.CalendarData = MockCalendarData;
+
   const g = globalThis as any;
 
   // Template functions
@@ -401,18 +584,29 @@ export function setupFoundryGlobals() {
 
   // Handlebars
   g.Handlebars = {
+    compile: vi.fn().mockReturnValue(vi.fn().mockReturnValue('mock-template-result')),
     registerHelper: vi.fn(),
     registerPartial: vi.fn()
   };
 
-  // Hooks system
-  g.Hooks = {
-    on: vi.fn(),
-    once: vi.fn(),
-    off: vi.fn(),
-    call: vi.fn(),
-    callAll: vi.fn()
-  };
+  // Hooks system - use functional hooks by default for proper callback execution
+  if (options.functionalHooks !== false) {
+    // Clear any existing hooks from previous setup runs to prevent cross-test leakage
+    MockHooks.clear();
+    g.Hooks = MockHooks;
+  } else {
+    g.Hooks = {
+      on: vi.fn(),
+      once: vi.fn(),
+      off: vi.fn(),
+      call: vi.fn(),
+      callAll: vi.fn()
+    };
+  }
+
+  // Also expose ApplicationV2 and CalendarData as globals
+  g.ApplicationV2 = MockApplicationV2;
+  g.CalendarData = MockCalendarData;
 
   // PIXI Graphics (for canvas-based tests)
   g.PIXI = {
@@ -509,11 +703,13 @@ export function setupFoundryGame(options: {
     settings: {
       get: vi.fn(),
       set: vi.fn(),
-      register: vi.fn()
+      register: vi.fn(),
+      registerMenu: vi.fn()
     },
     i18n: {
+      lang: 'en',
       localize: vi.fn((key: string) => key),
-      format: vi.fn((key: string, data?: any) => key)
+      format: vi.fn((key: string, _data?: any) => key)
     },
     system: {
       id: options.systemId || 'test-system',
@@ -599,13 +795,15 @@ export function setupFoundryMocks(options: {
   scenes?: MockScene[];
   includeCanvas?: boolean;
   includeRegions?: boolean;
+  /** Use functional hooks that actually execute callbacks (default: true) */
+  functionalHooks?: boolean;
 } = {}) {
-  setupFoundryGlobals();
+  setupFoundryGlobals({ functionalHooks: options.functionalHooks });
   setupFoundryDocuments();
   setupFoundryGame(options);
   setupFoundryUI();
   setupFoundryConfig();
-  
+
   if (options.includeCanvas !== false) {
     setupFoundryCanvas(options.scenes?.[0]);
   }
